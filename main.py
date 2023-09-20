@@ -32,9 +32,16 @@ def add_product():
     quantity = quantity_entry.get("1.0", "end-1c")
     price = price_entry.get("1.0", "end-1c")
 
-    print("Product Name:", product_name)
-    print("Quantity:", quantity)
-    print("Price:", price)
+    if not product_name or not quantity or not price:
+        messagebox.showerror('Error', 'Please fill out all fields')
+        return
+
+    table.insert("", "end", values=(product_name, quantity, price))
+
+    messagebox.showinfo('Success', 'Product added successfully!')
+    product_name = product_name_entry.delete("1.0", "end-1c")
+    quantity = quantity_entry.delete("1.0", "end-1c")
+    price = price_entry.delete("1.0", "end-1c")
 
 
 def modify_product():
@@ -51,7 +58,7 @@ def modify_product():
         product_name_label.grid(row=0, column=0)
         product_name_entry = tk.Entry(modify_window)
         product_name_entry.grid(row=0, column=1)
-        product_name_entry.insert(0, values[0])  # Set the initial value
+        product_name_entry.insert(0, values[0])
 
         quantity_label = tk.Label(modify_window, text="Quantity:")
         quantity_label.grid(row=1, column=0)
