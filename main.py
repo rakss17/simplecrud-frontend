@@ -1,7 +1,6 @@
 import tkinter as tk
 
 
-
 window = tk.Tk()
 window.title("CRUD")
 window.geometry("500x500")
@@ -13,7 +12,7 @@ window.geometry("500x500")
 #     # Update the GUI with the retrieved data
 
 
-label = tk.Label(window, text="Welcome to Django Tkinter App")
+label = tk.Label(window, text="Simple Inventory System (CRUD)")
 button = tk.Button(window, text="Fetch Data")
 
 
