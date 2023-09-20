@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter.font import Font
+import tkinter.messagebox as messagebox
 
 window = tk.Tk()
 window.title("CRUD")
@@ -27,29 +28,25 @@ def load_products():
 
 
 def add_product():
-    # Retrieve data from the Entry or Text widgets
-    # Retrieve text from the Text widget
     product_name = product_name_entry.get("1.0", "end-1c")
     quantity = quantity_entry.get("1.0", "end-1c")
     price = price_entry.get("1.0", "end-1c")
 
-    # Print the retrieved data (you can replace this with your desired action)
     print("Product Name:", product_name)
     print("Quantity:", quantity)
     print("Price:", price)
 
 
 def modify_product():
+
     selected_item = table.selection()
     if selected_item:
-        # Get the values of the selected product
+
         values = table.item(selected_item, 'values')
 
-        # Create a new window for modification
         modify_window = tk.Toplevel(window)
         modify_window.title("Modify Product")
 
-        # Populate the new window with the selected product details
         product_name_label = tk.Label(modify_window, text="Product Name:")
         product_name_label.grid(row=0, column=0)
         product_name_entry = tk.Entry(modify_window)
@@ -68,7 +65,6 @@ def modify_product():
         price_entry.grid(row=2, column=1)
         price_entry.insert(0, values[2])
 
-        # Function to update the Treeview with the modified details
         def update_product():
             new_values = (
                 product_name_entry.get(),
@@ -76,18 +72,23 @@ def modify_product():
                 price_entry.get()
             )
             table.item(selected_item, values=new_values)
+            messagebox.showinfo('Success', 'Product modified successfully!')
             modify_window.destroy()
 
-        # Add a "Save" button to confirm the changes
         save_button = tk.Button(
             modify_window, text="Save", command=update_product)
         save_button.grid(row=3, columnspan=2)
+    else:
+        messagebox.showerror('Error', 'Please select a product to modify!')
 
 
 def delete_product():
     selected_item = table.selection()
     if selected_item:
         table.delete(selected_item)
+        messagebox.showinfo('Success', 'Product deleted successfully!')
+    else:
+        messagebox.showerror('Error', 'Please select a product to remove!')
 
 
 screen_width = window.winfo_screenwidth()
