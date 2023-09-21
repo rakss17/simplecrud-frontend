@@ -157,24 +157,21 @@ def modify_product():
 def delete_product():
     selected_item = table.selection()
     if selected_item:
-        # Get the selected index
+
         selected_index = table.index(selected_item)
 
-        # Ensure the selected index is within the range of loaded_products
         if selected_index < len(loaded_products):
             product_id = loaded_products[selected_index]['id']
 
             try:
-                # Send a DELETE request to the Django API endpoint with the product_id
+
                 response = requests.delete(
                     f"http://localhost:8000/products/update-delete/{product_id}/")
 
-                # Check if the request was successful (status code 204 for no content)
                 if response.status_code == 204:
-                    # Remove the product from loaded_products
+
                     del loaded_products[selected_index]
 
-                    # Remove the product from the table
                     table.delete(selected_item)
 
                     messagebox.showinfo(
