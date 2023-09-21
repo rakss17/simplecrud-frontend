@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter.font import Font
 import tkinter.messagebox as messagebox
+import requests
 
 window = tk.Tk()
 window.title("CRUD")
@@ -14,17 +15,28 @@ style.configure("Treeview.Heading", font=(
 
 
 def load_products():
-    products = [
-        ("Product 1", "Category A", "$19.99"),
-        ("Product 2", "Category B", "$29.99"),
-        ("Product 3", "Category A", "$24.99"),
-    ]
+    try:
 
-    for product in products:
-        table.insert("", "end", values=product, tags=('cell_text',))
+        response = requests.get("http://localhost:8000/products/create-fetch/")
 
-    table.tag_configure('cell_text', font=(
-        "Helvetica", 10))
+        if response.status_code == 200:
+
+            products = response.json()
+
+            for item in table.get_children():
+                table.delete(item)
+
+            for product in products:
+                table.insert("", "end", values=(
+                    product['product_name'], product['quantity'], product['price']))
+
+            messagebox.showinfo('Success', 'Products loaded successfully!')
+        else:
+            messagebox.showerror(
+                'Error', f'Failed to fetch data. Status Code: {response.status_code}')
+
+    except requests.exceptions.RequestException as e:
+        messagebox.showerror('Error', f'Failed to fetch data. Error: {str(e)}')
 
 
 def add_product():
