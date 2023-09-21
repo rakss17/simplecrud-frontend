@@ -48,12 +48,33 @@ def add_product():
         messagebox.showerror('Error', 'Please fill out all fields')
         return
 
-    table.insert("", "end", values=(product_name, quantity, price))
+    product_data = {
+        'product_name': product_name,
+        'quantity': quantity,
+        'price': price
+    }
 
-    messagebox.showinfo('Success', 'Product added successfully!')
-    product_name = product_name_entry.delete("1.0", "end-1c")
-    quantity = quantity_entry.delete("1.0", "end-1c")
-    price = price_entry.delete("1.0", "end-1c")
+    try:
+
+        response = requests.post(
+            "http://localhost:8000/products/create-fetch/", json=product_data)
+
+        if response.status_code == 201:
+
+            table.insert("", "end", values=(product_name, quantity, price))
+
+            messagebox.showinfo('Success', 'Product added successfully!')
+
+            product_name_entry.delete("1.0", "end-1c")
+            quantity_entry.delete("1.0", "end-1c")
+            price_entry.delete("1.0", "end-1c")
+        else:
+            messagebox.showerror(
+                'Error', f'Failed to add product. Status Code: {response.status_code}')
+
+    except requests.exceptions.RequestException as e:
+        messagebox.showerror(
+            'Error', f'Failed to add product. Error: {str(e)}')
 
 
 def modify_product():
