@@ -14,6 +14,9 @@ style.configure("Treeview.Heading", font=(
     "Helvetica", 12, "bold"), padding=(0, 10))
 
 
+loaded_products = []
+
+
 def load_products():
     try:
 
@@ -27,6 +30,10 @@ def load_products():
                 table.delete(item)
 
             for product in products:
+
+                product_id = product['id']
+                loaded_products.append(
+                    {'id': product_id, 'product_name': product['product_name'], 'quantity': product['quantity'], 'price': product['price']})
                 table.insert("", "end", values=(
                     product['product_name'], product['quantity'], product['price']))
 
@@ -106,14 +113,39 @@ def modify_product():
         price_entry.insert(0, values[2])
 
         def update_product():
-            new_values = (
-                product_name_entry.get(),
-                quantity_entry.get(),
-                price_entry.get()
-            )
-            table.item(selected_item, values=new_values)
-            messagebox.showinfo('Success', 'Product modified successfully!')
-            modify_window.destroy()
+            new_values = {
+                'name': product_name_entry.get(),
+                'quantity': quantity_entry.get(),
+                'price': price_entry.get()
+            }
+
+            selected_index = table.index(selected_item)
+            if selected_index < len(loaded_products):
+                product_id = loaded_products[selected_index]['id']
+
+                try:
+
+                    response = requests.put(
+                        f"http://localhost:8000/products/update-delete/{product_id}/", json=new_values)
+
+                    if response.status_code == 200:
+
+                        loaded_products[selected_index].update(new_values)
+                        table.item(selected_item, values=(
+                            new_values['name'], new_values['quantity'], new_values['price']))
+                        messagebox.showinfo(
+                            'Success', 'Product modified successfully!')
+                        modify_window.destroy()
+                    else:
+                        messagebox.showerror(
+                            'Error', f'Failed to modify product. Status Code: {response.status_code}')
+
+                except requests.exceptions.RequestException as e:
+                    messagebox.showerror(
+                        'Error', f'Failed to modify product. Error: {str(e)}')
+            else:
+                messagebox.showerror(
+                    'Error', 'Selected index is out of range!')
 
         save_button = tk.Button(
             modify_window, text="Save", command=update_product)
